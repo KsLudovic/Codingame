@@ -1,0 +1,97 @@
+import java.util.*;
+
+class Player {
+
+    public static void main(String args[]) {
+        Scanner in = new Scanner(System.in);
+        int height = in.nextInt(); // number of rows.
+        int width = in.nextInt(); // number of columns.
+        int alarm = in.nextInt(); // number of rounds between the time the alarm countdown is activated and the time the alarm goes off.
+        int[][] deltas = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}};
+        char target = 'C';
+        
+        // game loop
+        while (true) {
+            int y = in.nextInt(); // row where Kirk is located.
+            int x = in.nextInt(); // column where Kirk is located.
+            String[] labyrinth = new String[height];
+            int[][] distances = new int[height][width];
+            for (int row = 0; row < height; row++) {
+                labyrinth[row] = in.next(); // C of the characters in '#.TC?' (i.e. one line of the ASCII maze).
+            }
+            
+            if (labyrinth[y].charAt(x) == 'C') target = 'T';
+            ArrayList<Coord> buffer = new ArrayList<Coord>();
+            buffer.add(new Coord(x, y));
+            distances[y][x] = 1;
+            int pos = 0;
+            boolean foundUnknown = false;
+            boolean foundTarget = false;
+            int unknownX = -1, unknownY = -1;
+            int targetX = -1, targetY = -1;
+            while (pos < buffer.size() && !foundTarget) {
+                Coord coord = buffer.get(pos);
+                int distance = distances[coord.y][coord.x];
+                for (int[] delta: deltas) {
+                    int newX = coord.x + delta[0];
+                    int newY = coord.y + delta[1];
+                    if (newX >= 0 && newY >= 0 && newX < width && newY < height && distances[newY][newX] == 0 && labyrinth[newY].charAt(newX) != '#') {
+                        if (labyrinth[newY].charAt(newX) == target) {
+                            distances[newY][newX] = distance + 1;
+                            foundTarget = true;
+                            targetX = newX;
+                            targetY = newY;
+                            break;
+                        } else if (labyrinth[newY].charAt(newX) == '?' && !foundUnknown) {
+                            distances[newY][newX] = distance + 1;
+                            foundUnknown = true;
+                            unknownX = newX;
+                            unknownY = newY;
+                        } else if (labyrinth[newY].charAt(newX) != '?') {
+                            distances[newY][newX] = distance + 1;
+                            buffer.add(new Coord(newX, newY));
+                        }
+                    }
+                }
+                pos++;
+            }
+            
+            if (!foundTarget) {
+                targetX = unknownX;
+                targetY = unknownY;
+            }
+            while (distances[targetY][targetX] != 2) {
+                for (int[] delta: deltas) {
+                    int newX = targetX + delta[0];
+                    int newY = targetY + delta[1];
+                    if (newX >= 0 && newY >= 0 && newX < width && newY < height && distances[newY][newX] == distances[targetY][targetX] - 1) {
+                        targetX += delta[0];
+                        targetY += delta[1];
+                        break;
+                    }
+                }
+            }
+            
+            if (targetX > x) {
+                System.out.println("RIGHT");
+            } else if (targetX < x) {
+                System.out.println("LEFT");
+            } else if (targetY > y) {
+                System.out.println("DOWN");
+            } else if (targetY < y) {
+                System.out.println("UP");
+            }
+            
+        }
+    }
+}
+
+class Coord {
+    int x;
+    int y;
+    
+    public Coord(int x, int y) {
+        this.x = x;
+        this.y = y;
+    }
+}
