@@ -1,0 +1,33 @@
+import java.util.*;
+
+class Solution {
+
+    public static void main(String args[]) {
+        Scanner in = new Scanner(System.in);
+        int W = in.nextInt();
+        int H = in.nextInt();
+        char [][] lines = new char[H-2][W];
+        if (in.hasNextLine()) {
+            in.nextLine();
+        }
+        char [] starts = in.nextLine().toCharArray();
+        for (int row = 0; row < H-2; row++) {
+            lines[row] = in.nextLine().toCharArray();
+        }
+        char [] ends = in.nextLine().toCharArray();
+        
+        for (int startCol = 0 ; startCol < W ; startCol+=3) {
+            System.out.print(starts[startCol]);
+            int col = startCol;
+            for (int row = 0 ; row < lines.length ; row++) {
+                if (col < W-1 && lines[row][col+1] != ' ') {
+                    col += 3;
+                } else if (col > 0 && lines[row][col-1] != ' ') {
+                    col -= 3;
+                }
+            }
+            System.out.println(ends[col]);
+            
+        }
+    }
+}
